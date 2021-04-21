@@ -55,6 +55,14 @@ button:hover {
     background-color: darkgrey;
 }
 
+/* Jika ukuran layar 680px atau kurang dari itu */
+
+@media screen and (max-width:680px){
+
+	.container {
+        width: 400px;
+}
+
 .operator:hover {
     background-color: darkorange;
 }
