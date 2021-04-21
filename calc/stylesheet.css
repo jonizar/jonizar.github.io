@@ -7,6 +7,7 @@ h1 {
 p {
     color: grey;
 }
+
 .calculator {
     text-align: center;
     margin: 0 auto;
@@ -55,14 +56,19 @@ button:hover {
     background-color: darkgrey;
 }
 
+.operator:hover {
+    background-color: darkorange;
+}
+
 /* Jika ukuran layar 680px atau kurang dari itu */
 
 @media screen and (max-width:680px){
 
 	.container {
-        width: 400px;
-}
-
-.operator:hover {
-    background-color: darkorange;
+        	width: 400px;
+	}
+	
+	.calculator {
+		padding-top: 0px;
+	}
 }
