@@ -63,10 +63,10 @@ button:hover {
 /* Jika ukuran layar 680px atau kurang dari itu */
 
 @media screen and (max-width:680px){
-
-	
 	.calculator {
-		padding-top: 0px;
-		width: 100%;
+	    text-align: center;
+	    margin: 1px;
+	    padding-top: 1px;
+	    width: auto;
 	}
 }
