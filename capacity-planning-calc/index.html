@@ -1,0 +1,215 @@
+
+<style>
+*{box-sizing:border-box}
+body{margin:0}
+.wrap{padding:16px 0;font-size:14px;color:var(--color-text-primary)}
+h2{font-size:16px;font-weight:500;margin:0 0 4px}
+.sub{font-size:12px;color:var(--color-text-secondary);margin:0 0 16px}
+.section{background:var(--color-background-secondary);border:1px solid var(--color-border-tertiary);border-radius:12px;padding:16px;margin-bottom:12px}
+.row{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+label{font-size:12px;color:var(--color-text-secondary);min-width:130px}
+input[type=number],input[type=text]{background:var(--color-background-primary);border:1px solid var(--color-border-secondary);border-radius:8px;padding:6px 10px;font-size:13px;color:var(--color-text-primary);width:80px}
+input[type=range]{flex:1;min-width:120px}
+.range-val{font-size:12px;color:var(--color-text-secondary);min-width:36px;text-align:right}
+.member-row{display:flex;gap:8px;align-items:center;padding:8px;background:var(--color-background-primary);border:1px solid var(--color-border-tertiary);border-radius:8px;margin-bottom:6px;flex-wrap:wrap}
+.member-row input[type=text]{width:100px}
+.member-row input[type=number]{width:64px}
+.tag{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500}
+.tag-dev{background:#E1F5EE;color:#085041}
+.tag-qa{background:#E6F1FB;color:#0C447C}
+.tag-uiux{background:#EEEDFE;color:#3C3489}
+.tag-other{background:#F1EFE8;color:#444441}
+select{background:var(--color-background-primary);border:1px solid var(--color-border-secondary);border-radius:8px;padding:6px 8px;font-size:12px;color:var(--color-text-primary)}
+.btn{padding:6px 14px;border-radius:8px;border:none;font-size:12px;cursor:pointer;font-weight:500}
+.btn-add{background:var(--color-background-primary);border:1px solid var(--color-border-secondary);color:var(--color-text-primary)}
+.btn-del{background:none;border:none;color:var(--color-text-secondary);cursor:pointer;font-size:14px;padding:0 4px}
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.result-card{background:var(--color-background-primary);border:1px solid var(--color-border-tertiary);border-radius:10px;padding:12px;text-align:center}
+.result-big{font-size:26px;font-weight:500;color:var(--color-text-primary)}
+.result-label{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.result-note{font-size:11px;color:var(--color-text-secondary);margin-top:8px;padding:8px;background:var(--color-background-secondary);border-radius:8px;line-height:1.5}
+.sp-row{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.sp-input{width:56px}
+.divider{border:none;border-top:1px solid var(--color-border-tertiary);margin:12px 0}
+.warn{color:var(--color-text-warning);font-size:11px;margin-top:4px}
+.member-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.member-table th{text-align:left;color:var(--color-text-secondary);padding:4px 6px;font-weight:400;border-bottom:1px solid var(--color-border-tertiary)}
+.member-table td{padding:5px 6px;border-bottom:1px solid var(--color-border-tertiary)}
+</style>
+<div class="wrap">
+  <h2>Capacity planning calculator</h2>
+  <p class="sub">Hitung kapasitas riil tim per Sprint, terpisah dari story points</p>
+
+  <div class="section">
+    <div style="font-size:13px;font-weight:500;margin-bottom:10px">Parameter Sprint</div>
+    <div class="row">
+      <label>Hari kerja Sprint</label>
+      <input type="number" id="sprintDays" value="10" min="1" max="14" oninput="calc()">
+      <span style="font-size:12px;color:var(--color-text-secondary)">hari</span>
+    </div>
+    <div class="row">
+      <label>Jam kerja / hari</label>
+      <input type="number" id="hoursPerDay" value="8" min="4" max="12" oninput="calc()">
+      <span style="font-size:12px;color:var(--color-text-secondary)">jam</span>
+    </div>
+    <div class="row" style="align-items:flex-start">
+      <label style="padding-top:6px">Focus factor</label>
+      <div style="flex:1">
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="range" id="focusFactor" min="40" max="90" value="70" oninput="calc();document.getElementById('ffVal').textContent=this.value+'%'">
+          <span class="range-val" id="ffVal">70%</span>
+        </div>
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">60–70% umum untuk tim yang mature. Tim baru: 50–60%</div>
+      </div>
+    </div>
+    <div class="row">
+      <label>Overhead ceremony</label>
+      <input type="number" id="ceremonyHours" value="6" min="0" max="20" oninput="calc()">
+      <span style="font-size:12px;color:var(--color-text-secondary)">jam/Sprint (Planning+Review+Retro+Daily)</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="font-size:13px;font-weight:500">Anggota Tim</span>
+      <button class="btn btn-add" onclick="addMember()">+ Tambah anggota</button>
+    </div>
+    <div id="memberList"></div>
+  </div>
+
+  <div class="section">
+    <div style="font-size:13px;font-weight:500;margin-bottom:10px">Velocity historis (opsional)</div>
+    <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:8px">Isi SP yang berhasil di-deliver di 3 Sprint terakhir</div>
+    <div class="sp-row">
+      <span style="font-size:12px;color:var(--color-text-secondary);min-width:70px">Sprint -1</span>
+      <input class="sp-input" type="number" id="sp1" placeholder="SP" min="0" oninput="calc()">
+    </div>
+    <div class="sp-row">
+      <span style="font-size:12px;color:var(--color-text-secondary);min-width:70px">Sprint -2</span>
+      <input class="sp-input" type="number" id="sp2" placeholder="SP" min="0" oninput="calc()">
+    </div>
+    <div class="sp-row">
+      <span style="font-size:12px;color:var(--color-text-secondary);min-width:70px">Sprint -3</span>
+      <input class="sp-input" type="number" id="sp3" placeholder="SP" min="0" oninput="calc()">
+    </div>
+  </div>
+
+  <div class="section" id="resultSection">
+    <div style="font-size:13px;font-weight:500;margin-bottom:10px">Hasil kalkulasi</div>
+    <div class="result-grid">
+      <div class="result-card">
+        <div class="result-big" id="res-hours">0</div>
+        <div class="result-label">Total jam tersedia tim</div>
+      </div>
+      <div class="result-card">
+        <div class="result-big" id="res-focus">0</div>
+        <div class="result-label">Jam fokus efektif</div>
+      </div>
+      <div class="result-card">
+        <div class="result-big" id="res-mandays">0</div>
+        <div class="result-label">Effective person-days</div>
+      </div>
+      <div class="result-card">
+        <div class="result-big" id="res-velocity">—</div>
+        <div class="result-label">Avg. velocity (SP)</div>
+      </div>
+    </div>
+    <div class="result-note" id="res-note">Isi data tim dan velocity untuk mendapat rekomendasi Sprint commit.</div>
+    <div id="member-breakdown" style="margin-top:12px"></div>
+  </div>
+</div>
+
+<script>
+const roles=['Dev','QA','UI/UX','PO','SM','Other'];
+const tagClass={'Dev':'tag-dev','QA':'tag-qa','UI/UX':'tag-uiux','PO':'tag-other','SM':'tag-other','Other':'tag-other'};
+let members=[
+  {name:'Dev Lead',role:'Dev',leave:0},
+  {name:'Developer',role:'Dev',leave:0},
+  {name:'QA',role:'QA',leave:0},
+];
+
+function addMember(){
+  members.push({name:'Member '+(members.length+1),role:'Dev',leave:0});
+  render();calc();
+}
+function removeMember(i){
+  members.splice(i,1);render();calc();
+}
+function render(){
+  const list=document.getElementById('memberList');
+  list.innerHTML=members.map((m,i)=>`
+    <div class="member-row">
+      <input type="text" value="${m.name}" oninput="members[${i}].name=this.value;calc()" style="width:110px">
+      <select onchange="members[${i}].role=this.value;calc()">
+        ${roles.map(r=>`<option${r===m.role?' selected':''}>${r}</option>`).join('')}
+      </select>
+      <span style="font-size:12px;color:var(--color-text-secondary)">Cuti:</span>
+      <input type="number" value="${m.leave}" min="0" max="14" oninput="members[${i}].leave=+this.value;calc()" style="width:52px">
+      <span style="font-size:12px;color:var(--color-text-secondary)">hari</span>
+      <button class="btn-del" onclick="removeMember(${i})">x</button>
+    </div>
+  `).join('');
+}
+
+function calc(){
+  const sprint=+document.getElementById('sprintDays').value||10;
+  const hpd=+document.getElementById('hoursPerDay').value||8;
+  const ff=(+document.getElementById('focusFactor').value||70)/100;
+  const ceremony=+document.getElementById('ceremonyHours').value||0;
+
+  let totalRaw=0,totalFocus=0,breakdown=[];
+  const devMembers=members.filter(m=>m.role==='Dev'||m.role==='QA'||m.role==='UI/UX');
+
+  members.forEach(m=>{
+    const avail=(sprint-m.leave)*hpd;
+    const focus=Math.max(0,avail*ff-(ceremony/members.length));
+    const pd=focus/hpd;
+    totalRaw+=avail;
+    totalFocus+=focus;
+    breakdown.push({...m,avail,focus,pd});
+  });
+
+  const totalPd=totalFocus/hpd;
+
+  document.getElementById('res-hours').textContent=Math.round(totalRaw);
+  document.getElementById('res-focus').textContent=Math.round(totalFocus);
+  document.getElementById('res-mandays').textContent=totalPd.toFixed(1);
+
+  const s1=+document.getElementById('sp1').value;
+  const s2=+document.getElementById('sp2').value;
+  const s3=+document.getElementById('sp3').value;
+  const filled=[s1,s2,s3].filter(v=>v>0);
+  let avgVel=null;
+  if(filled.length>0){
+    avgVel=filled.reduce((a,b)=>a+b,0)/filled.length;
+    document.getElementById('res-velocity').textContent=Math.round(avgVel)+' SP';
+  } else {
+    document.getElementById('res-velocity').textContent='—';
+  }
+
+  let note='';
+  if(avgVel){
+    const spPerPd=avgVel/(sprint*devMembers.length||1);
+    const recommended=Math.round(totalPd*spPerPd*0.85);
+    note=`Rekomendasi commit Sprint ini: ±<strong>${recommended} SP</strong> (berdasarkan velocity avg ${Math.round(avgVel)} SP dengan kapasitas efektif ${totalPd.toFixed(1)} person-days, buffer 15%). Ini bukan minimum — ini target realistis.`;
+  } else {
+    note=`Kapasitas efektif Sprint ini: <strong>${totalPd.toFixed(1)} person-days</strong> (${Math.round(totalFocus)} jam fokus). Isi velocity historis untuk mendapat rekomendasi SP commit.`;
+  }
+  document.getElementById('res-note').innerHTML=note;
+
+  const bHtml=`<table class="member-table">
+    <tr><th>Nama</th><th>Peran</th><th>Cuti</th><th>Jam tersedia</th><th>Jam fokus</th><th>Person-days</th></tr>
+    ${breakdown.map(m=>`<tr>
+      <td>${m.name}</td>
+      <td><span class="tag ${tagClass[m.role]||'tag-other'}">${m.role}</span></td>
+      <td>${m.leave}h</td>
+      <td>${Math.round(m.avail)}j</td>
+      <td>${Math.round(m.focus)}j</td>
+      <td>${m.pd.toFixed(1)}</td>
+    </tr>`).join('')}
+  </table>`;
+  document.getElementById('member-breakdown').innerHTML=bHtml;
+}
+
+render();calc();
+</script>
